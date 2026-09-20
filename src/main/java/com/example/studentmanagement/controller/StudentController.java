@@ -2,10 +2,13 @@ package com.example.studentmanagement.controller;
 
 import com.example.studentmanagement.entity.Student;
 import com.example.studentmanagement.service.StudentService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@RestController 
+@RestController
 @RequestMapping("/students")
 public class StudentController {
     private final StudentService studentService;
@@ -15,27 +18,27 @@ public class StudentController {
     }
 
     @PostMapping
-    public Student createStudent(@RequestBody Student student) {
+    public Student createStudent(@Valid @RequestBody Student student) {
         return studentService.createStudent(student);
     }
 
     @GetMapping
-    public List<Student> getAllStudents(){
+    public List<Student> getAllStudents() {
         return studentService.getAllStudents();
     }
 
     @GetMapping("/{id}")
-    public Student getStudentById(@PathVariable Long id){
+    public Student getStudentById(@PathVariable Long id) {
         return studentService.getStudentById(id);
     }
 
     @PutMapping("/{id}")
-    public Student updateStudent(@PathVariable Long id, @RequestBody Student student){
+    public Student updateStudent(@PathVariable Long id, @Valid @RequestBody Student student) {
         return studentService.updateStudent(id, student);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteStudent(@PathVariable Long id){
+    public void deleteStudent(@PathVariable Long id) {
         studentService.deleteStudent(id);
     }
 }
