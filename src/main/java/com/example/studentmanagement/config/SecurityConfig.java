@@ -1,5 +1,6 @@
 package com.example.studentmanagement.config;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -56,6 +57,18 @@ public class SecurityConfig {
                         SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/students/**")
+                        .hasAnyRole("ADMIN", "FACULTY")
+
+                        .requestMatchers(HttpMethod.PUT, "/students/**")
+                        .hasAnyRole("ADMIN", "FACULTY")
+
+                        .requestMatchers(HttpMethod.POST, "/students")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.DELETE, "/students/**")
+                        .hasRole("ADMIN")
+
                         .anyRequest().authenticated())
                 .addFilterBefore(
                         jwtAuthenticationFilter,
