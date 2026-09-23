@@ -9,6 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.example.studentmanagement.service.CustomUserDetailsService;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -51,10 +54,29 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, authException) -> {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Unauthorized");
+        };
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("Forbidden");
+        };
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint())
+                        .accessDeniedHandler(accessDeniedHandler()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/students/**")
@@ -66,7 +88,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/students")
                         .hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.DELETE, "/students/**")
+                        .requestMatchers(
+                                HttpMethod.DELETE, "/students/**")
                         .hasRole("ADMIN")
 
                         .anyRequest().authenticated())

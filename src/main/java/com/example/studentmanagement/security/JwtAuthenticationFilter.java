@@ -15,7 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Component 
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -31,6 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
+
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain)
@@ -45,27 +46,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
-        String username = jwtService.extractUsername(token);
+        try {
 
-        if (username != null &&
-                SecurityContextHolder.getContext().getAuthentication() == null) {
+            String username = jwtService.extractUsername(token);
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (username != null &&
+                    SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            if (jwtService.isTokenValid(token, userDetails.getUsername())) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
+                if (jwtService.isTokenValid(token, userDetails.getUsername())) {
 
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request));
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
 
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authentication);
+                    authentication.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request));
+
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authentication);
+                }
             }
+
+        } catch (Exception exception) {
+
+            response.sendError(
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    "Invalid or expired token");
+
+            return;
         }
 
         filterChain.doFilter(request, response);
