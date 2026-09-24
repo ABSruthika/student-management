@@ -7,6 +7,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.example.studentmanagement.entity.Student;
 import com.example.studentmanagement.service.StudentService;
+import com.example.studentmanagement.service.JwtService;
+import com.example.studentmanagement.service.CustomUserDetailsService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -31,6 +33,12 @@ public class StudentControllerTest {
 
     @MockitoBean
     private StudentService studentService;
+
+    @MockitoBean
+private JwtService jwtService;
+
+@MockitoBean
+private CustomUserDetailsService customUserDetailsService;
 
     @Test
     void getAllStudents_shouldReturnAllStudents() throws Exception {
