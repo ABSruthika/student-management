@@ -7,6 +7,7 @@ function Register() {
 
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [validationError, setValidationError] = useState("");
     const [loading, setLoading] = useState(false);
 
     async function handleSubmit(event) {
@@ -14,6 +15,18 @@ function Register() {
 
         setSuccessMessage("");
         setErrorMessage("");
+        setValidationError("");
+
+        if (username.trim().length < 3) {
+            setValidationError("Username must be at least 3 characters");
+            return;
+        }
+
+        if (password.length < 6) {
+            setValidationError("Password must be at least 6 characters");
+            return;
+        }
+
         setLoading(true);
 
         const userData = {
@@ -64,6 +77,10 @@ function Register() {
 
             {errorMessage && (
                 <p>{errorMessage}</p>
+            )}
+
+            {validationError && (
+                <p>{validationError}</p>
             )}
 
             <form onSubmit={handleSubmit}>
