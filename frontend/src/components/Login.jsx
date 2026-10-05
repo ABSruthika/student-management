@@ -52,6 +52,8 @@ function Login() {
             console.log("Login response:", data);
             console.log("JWT token:", data.token);
 
+            localStorage.setItem("token", data.token);
+
             setSuccessMessage("Login successful!");
 
             setUsername("");
