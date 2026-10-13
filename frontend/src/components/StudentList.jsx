@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "../api/api";
 
-function StudentList({ refreshKey }) {
+function StudentList({ refreshKey, role }) {
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState("");
@@ -97,34 +97,34 @@ function StudentList({ refreshKey }) {
     }
 
     async function handleDelete(student) {
-    const confirmed = window.confirm(
-        `Are you sure you want to delete ${student.name}?`
-    );
+        const confirmed = window.confirm(
+            `Are you sure you want to delete ${student.name}?`
+        );
 
-    if (!confirmed) {
-        return;
-    }
-
-    setErrorMessage("");
-    setSuccessMessage("");
-
-    try {
-        await apiRequest(`/students/${student.id}`, {
-            method: "DELETE",
-        });
-
-        setSuccessMessage("Student deleted successfully!");
-
-        if (editingStudent?.id === student.id) {
-            handleCancelEdit();
+        if (!confirmed) {
+            return;
         }
 
-        await fetchStudents();
-    } catch (error) {
-        console.error("Failed to delete student:", error);
-        setErrorMessage(error.message || "Failed to delete student.");
+        setErrorMessage("");
+        setSuccessMessage("");
+
+        try {
+            await apiRequest(`/students/${student.id}`, {
+                method: "DELETE",
+            });
+
+            setSuccessMessage("Student deleted successfully!");
+
+            if (editingStudent?.id === student.id) {
+                handleCancelEdit();
+            }
+
+            await fetchStudents();
+        } catch (error) {
+            console.error("Failed to delete student:", error);
+            setErrorMessage(error.message || "Failed to delete student.");
+        }
     }
-}
 
     if (loading) {
         return <p>Loading students...</p>;
@@ -168,18 +168,17 @@ function StudentList({ refreshKey }) {
                                 <td>{student.age}</td>
                                 <td>{student.course}</td>
                                 <td>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleEdit(student)}
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleDelete(student)}
-                                    >
-                                        Delete
-                                    </button>
+                                    {(role === "ADMIN" || role === "FACULTY") && (
+                                        <button type="button" onClick={() => handleEdit(student)}>
+                                            Edit
+                                        </button>
+                                    )}
+
+                                    {role === "ADMIN" && (
+                                        <button type="button" onClick={() => handleDelete(student)}>
+                                            Delete
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))}

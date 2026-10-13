@@ -9,14 +9,21 @@ function App() {
         Boolean(localStorage.getItem("token"))
     );
 
+    const [role, setRole] = useState(
+        localStorage.getItem("role")
+    );
+
     const [refreshKey, setRefreshKey] = useState(0);
 
     function handleLoginSuccess() {
+        setRole(localStorage.getItem("role"));
         setIsLoggedIn(true);
     }
 
     function handleLogout() {
         localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        setRole(null);
         setIsLoggedIn(false);
     }
 
@@ -41,11 +48,11 @@ function App() {
                         Logout
                     </button>
 
-                    <AddStudent
-                        onStudentAdded={handleStudentAdded}
-                    />
+                    {role === "ADMIN" && (
+    <AddStudent onStudentAdded={handleStudentAdded} />
+)}
 
-                    <StudentList refreshKey={refreshKey} />
+                    <StudentList refreshKey={refreshKey} role={role} />
                 </>
             )}
         </div>
