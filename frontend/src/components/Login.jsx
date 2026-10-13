@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function Login() {
+function Login({ onLoginSuccess }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
@@ -49,12 +49,13 @@ function Login() {
 
             const data = await response.json();
 
-            console.log("Login response:", data);
-            console.log("JWT token:", data.token);
-
             localStorage.setItem("token", data.token);
 
             setSuccessMessage("Login successful!");
+
+            if (onLoginSuccess) {
+                onLoginSuccess();
+            }
 
             setUsername("");
             setPassword("");
