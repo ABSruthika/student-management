@@ -65,6 +65,14 @@ public class AuthService {
         String token = jwtService.generateToken(
                 authentication.getName());
 
-        return new LoginResponse(token);
+        String role = authentication.getAuthorities()
+                .stream()
+                .map(authority -> authority.getAuthority())
+                .filter(authority -> authority.startsWith("ROLE_"))
+                .map(authority -> authority.substring("ROLE_".length()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Authenticated user has no role"));
+
+        return new LoginResponse(token, role);
     }
 }
