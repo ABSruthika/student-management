@@ -2,14 +2,14 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "../api/api";
 
-function StudentList() {
+function StudentList({ refreshKey }) {
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         fetchStudents();
-    }, []);
+    }, [refreshKey]);
 
     async function fetchStudents() {
         try {
