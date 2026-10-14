@@ -1,10 +1,9 @@
+
 import { useState } from "react";
 
-function Register() {
+function Register({ onSwitchToLogin }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [role, setRole] = useState("FACULTY");
-
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [validationError, setValidationError] = useState("");
@@ -13,113 +12,143 @@ function Register() {
     async function handleSubmit(event) {
         event.preventDefault();
 
+        if (loading) return;
+
         setSuccessMessage("");
         setErrorMessage("");
         setValidationError("");
 
         if (username.trim().length < 3) {
-            setValidationError("Username must be at least 3 characters");
+            setValidationError(
+                "Username must be at least 3 characters."
+            );
             return;
         }
 
         if (password.length < 6) {
-            setValidationError("Password must be at least 6 characters");
+            setValidationError(
+                "Password must be at least 6 characters."
+            );
             return;
         }
 
         setLoading(true);
 
-        const userData = {
-            username: username,
-            password: password,
-            role: role,
-        };
-
         try {
-            const response = await fetch("http://localhost:8080/auth/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(userData),
-            });
+            const response = await fetch(
+                "http://localhost:8080/auth/register",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        username: username.trim(),
+                        password,
+                        role: "FACULTY",
+                    }),
+                }
+            );
 
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(errorText);
+                throw new Error(
+                    errorText || "Registration failed."
+                );
             }
 
-            const data = await response.json();
-
-            console.log("Registration response:", data);
-
-            setSuccessMessage("Registration successful!");
+            setSuccessMessage(
+                "Registration successful! You can now log in."
+            );
 
             setUsername("");
             setPassword("");
-            setRole("FACULTY");
         } catch (error) {
             console.error("Registration failed:", error);
-
-            setErrorMessage(error.message || "Registration failed");
+            setErrorMessage(
+                error.message ||
+                "Unable to register. Please try again."
+            );
         } finally {
             setLoading(false);
         }
     }
 
     return (
-        <div>
-            <h2>Register</h2>
+        <div className="auth-form">
+            <h2>Create an account</h2>
+            <p className="auth-description">
+                Register to access the student portal.
+            </p>
 
             {successMessage && (
-                <p>{successMessage}</p>
+                <p className="form-message success" role="status">
+                    {successMessage}
+                </p>
             )}
 
             {errorMessage && (
-                <p>{errorMessage}</p>
+                <p className="form-message error" role="alert">
+                    {errorMessage}
+                </p>
             )}
 
             {validationError && (
-                <p>{validationError}</p>
+                <p className="form-message error" role="alert">
+                    {validationError}
+                </p>
             )}
 
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Username:</label>
-
+                <div className="form-field">
+                    <label htmlFor="register-username">Username</label>
                     <input
+                        id="register-username"
                         type="text"
+                        autoComplete="username"
                         value={username}
-                        onChange={(event) => setUsername(event.target.value)}
+                        onChange={(event) =>
+                            setUsername(event.target.value)
+                        }
+                        required
+                        minLength={3}
                     />
                 </div>
 
-                <div>
-                    <label>Password:</label>
-
+                <div className="form-field">
+                    <label htmlFor="register-password">Password</label>
                     <input
+                        id="register-password"
                         type="password"
+                        autoComplete="new-password"
                         value={password}
-                        onChange={(event) => setPassword(event.target.value)}
+                        onChange={(event) =>
+                            setPassword(event.target.value)
+                        }
+                        required
+                        minLength={6}
                     />
                 </div>
 
-                <div>
-                    <label>Role:</label>
-
-                    <select
-                        value={role}
-                        onChange={(event) => setRole(event.target.value)}
-                    >
-                        <option value="FACULTY">Faculty</option>
-                        <option value="ADMIN">Admin</option>
-                    </select>
-                </div>
-
-                <button type="submit" disabled={loading}>
-                    {loading ? "Registering..." : "Register"}
+                <button
+                    className="button button-primary submit-button"
+                    type="submit"
+                    disabled={loading}
+                >
+                    {loading ? "Creating account..." : "Create account"}
                 </button>
             </form>
+
+            <p className="auth-switch">
+                Already have an account?{" "}
+                <button
+                    type="button"
+                    className="text-button"
+                    onClick={onSwitchToLogin}
+                >
+                    Login
+                </button>
+            </p>
         </div>
     );
 }
