@@ -13,9 +13,11 @@ function AddStudent({ onStudentAdded }) {
 
     async function handleSubmit(event) {
         event.preventDefault();
+
         if (loading) {
             return;
         }
+
         setSuccessMessage("");
         setErrorMessage("");
 
@@ -62,6 +64,7 @@ function AddStudent({ onStudentAdded }) {
             }
         } catch (error) {
             console.error("Failed to add student:", error);
+
             setErrorMessage(
                 error.message || "Failed to add student."
             );
@@ -74,13 +77,23 @@ function AddStudent({ onStudentAdded }) {
         <section>
             <h2>Add Student</h2>
 
-            {successMessage && <p>{successMessage}</p>}
-            {errorMessage && (
-                <p role="alert">Error: {errorMessage}</p>
+            {successMessage && (
+                <p className="form-message success" role="status">
+                    {successMessage}
+                </p>
             )}
 
-            <form onSubmit={handleSubmit}>
-                <div>
+            {errorMessage && (
+                <p className="form-message error" role="alert">
+                    Error: {errorMessage}
+                </p>
+            )}
+
+            <form
+                className="student-form"
+                onSubmit={handleSubmit}
+            >
+                <div className="form-field">
                     <label htmlFor="student-name">Name:</label>
                     <input
                         id="student-name"
@@ -93,7 +106,7 @@ function AddStudent({ onStudentAdded }) {
                     />
                 </div>
 
-                <div>
+                <div className="form-field">
                     <label htmlFor="student-email">Email:</label>
                     <input
                         id="student-email"
@@ -107,12 +120,13 @@ function AddStudent({ onStudentAdded }) {
                     />
                 </div>
 
-                <div>
+                <div className="form-field">
                     <label htmlFor="student-age">Age:</label>
                     <input
                         id="student-age"
                         type="number"
                         min="1"
+                        step="1"
                         value={age}
                         onChange={(event) =>
                             setAge(event.target.value)
@@ -121,7 +135,7 @@ function AddStudent({ onStudentAdded }) {
                     />
                 </div>
 
-                <div>
+                <div className="form-field">
                     <label htmlFor="student-course">Course:</label>
                     <input
                         id="student-course"
@@ -134,7 +148,11 @@ function AddStudent({ onStudentAdded }) {
                     />
                 </div>
 
-                <button type="submit" disabled={loading}>
+                <button
+                    className="button button-primary submit-button"
+                    type="submit"
+                    disabled={loading}
+                >
                     {loading ? "Adding..." : "Add Student"}
                 </button>
             </form>
