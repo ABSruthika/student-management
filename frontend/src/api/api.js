@@ -15,6 +15,13 @@ export async function apiRequest(endpoint, options = {}) {
     });
 
     if (!response.ok) {
+        if (response.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+
+            window.dispatchEvent(new Event("auth:unauthorized"));
+        }
+
         const errorText = await response.text();
 
         throw new Error(

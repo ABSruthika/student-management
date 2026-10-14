@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Register from "./components/Register";
 import Login from "./components/Login";
 import AddStudent from "./components/AddStudent";
@@ -12,6 +12,19 @@ function App() {
     const [role, setRole] = useState(
         localStorage.getItem("role")
     );
+
+    useEffect(() => {
+        function handleUnauthorized() {
+            setIsLoggedIn(false);
+            setRole(null);
+        }
+
+        window.addEventListener("auth:unauthorized", handleUnauthorized);
+
+        return () => {
+            window.removeEventListener("auth:unauthorized", handleUnauthorized);
+        };
+    }, []);
 
     const [refreshKey, setRefreshKey] = useState(0);
 
@@ -49,8 +62,8 @@ function App() {
                     </button>
 
                     {role === "ADMIN" && (
-    <AddStudent onStudentAdded={handleStudentAdded} />
-)}
+                        <AddStudent onStudentAdded={handleStudentAdded} />
+                    )}
 
                     <StudentList refreshKey={refreshKey} role={role} />
                 </>
