@@ -13,7 +13,9 @@ function AddStudent({ onStudentAdded }) {
 
     async function handleSubmit(event) {
         event.preventDefault();
-
+        if (loading) {
+            return;
+        }
         setSuccessMessage("");
         setErrorMessage("");
 
@@ -27,8 +29,10 @@ function AddStudent({ onStudentAdded }) {
             return;
         }
 
-        if (Number(age) < 1) {
-            setErrorMessage("Age must be at least 1.");
+        const numericAge = Number(age);
+
+        if (!Number.isInteger(numericAge) || numericAge < 1) {
+            setErrorMessage("Age must be a positive whole number.");
             return;
         }
 
@@ -40,7 +44,7 @@ function AddStudent({ onStudentAdded }) {
                 body: JSON.stringify({
                     name: name.trim(),
                     email: email.trim(),
-                    age: Number(age),
+                    age: numericAge,
                     course: course.trim(),
                 }),
             });
@@ -99,6 +103,7 @@ function AddStudent({ onStudentAdded }) {
                             setEmail(event.target.value)
                         }
                         required
+                        autoComplete="email"
                     />
                 </div>
 

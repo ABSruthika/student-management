@@ -57,7 +57,9 @@ function StudentList({ refreshKey, role }) {
 
     async function handleUpdate(event) {
         event.preventDefault();
-
+        if (saving) {
+            return;
+        }
         setErrorMessage("");
         setSuccessMessage("");
 
@@ -66,8 +68,10 @@ function StudentList({ refreshKey, role }) {
             return;
         }
 
-        if (Number(age) < 1) {
-            setErrorMessage("Age must be at least 1.");
+        const numericAge = Number(age);
+
+        if (!Number.isInteger(numericAge) || numericAge < 1) {
+            setErrorMessage("Age must be a positive whole number.");
             return;
         }
 
@@ -79,7 +83,7 @@ function StudentList({ refreshKey, role }) {
                 body: JSON.stringify({
                     name: name.trim(),
                     email: email.trim(),
-                    age: Number(age),
+                    age: numericAge,
                     course: course.trim(),
                 }),
             });
@@ -130,10 +134,6 @@ function StudentList({ refreshKey, role }) {
         return <p>Loading students...</p>;
     }
 
-    if (errorMessage && students.length === 0) {
-        return <p role="alert">Error: {errorMessage}</p>;
-    }
-
     return (
         <section>
             <h2>Student List</h2>
@@ -144,7 +144,7 @@ function StudentList({ refreshKey, role }) {
                 <p role="alert">Error: {errorMessage}</p>
             )}
 
-            {students.length === 0 ? (
+            {errorMessage ? null : students.length === 0 ? (
                 <p>No students found.</p>
             ) : (
                 <table>
@@ -213,6 +213,7 @@ function StudentList({ refreshKey, role }) {
                                     setEmail(event.target.value)
                                 }
                                 required
+                                autoComplete="email"
                             />
                         </div>
 
