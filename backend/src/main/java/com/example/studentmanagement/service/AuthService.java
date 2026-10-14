@@ -3,6 +3,7 @@ package com.example.studentmanagement.service;
 import com.example.studentmanagement.dto.RegisterRequest;
 import com.example.studentmanagement.dto.UserResponse;
 import com.example.studentmanagement.entity.User;
+import com.example.studentmanagement.enums.Role;
 import com.example.studentmanagement.repository.UserRepository;
 import com.example.studentmanagement.exception.UsernameAlreadyExistsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,7 +45,7 @@ public class AuthService {
         User user = new User(
                 request.getUsername(),
                 encodedPassword,
-                request.getRole());
+                Role.FACULTY);
 
         User savedUser = userRepository.save(user);
 
